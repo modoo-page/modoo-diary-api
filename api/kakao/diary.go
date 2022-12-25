@@ -197,7 +197,7 @@ func postRequestToken(c *fiber.Ctx) (err error) {
 	}
 
 	smtp.SendMail(email, createdToken)
-	return c.Type("application/json").JSON(makeSimpleText("이메일 요청이 완료됐습니다"))
+	return c.Type("application/json").JSON(makeSimpleText("이메일로 토큰 정보를 보내드렸습니다. 확인 후 입력해주세요."))
 }
 func postFailMethod(c *fiber.Ctx, message string) (err error) {
 	str := string(c.Body())
