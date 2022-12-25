@@ -2,16 +2,20 @@ package kakao
 
 import (
 	"fmt"
-	"golang-5252/database"
-	"math/rand"
+	"log"
+	"modoo-diary-api/database"
+	"modoo-diary-api/pkg/random"
+	smtp "modoo-diary-api/pkg/smtp"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type KakaoRequest struct {
-	User struct {
-		Id string `json:"id"`
-	} `json:"user"`
+	UserRequest struct {
+		User struct {
+			Id string `json:"id"`
+		} `json:"user"`
+	} `json:"userRequest"`
 	Action struct {
 		Params map[string]interface{}
 	}
@@ -62,13 +66,14 @@ func PostKakaoHandler(c *fiber.Ctx) error {
 	case "logout":
 		return postLogout(c)
 	default:
-		return postFailMethod(c)
+		return postFailMethod(c, "method")
 	}
 }
 func postReadDiary(c *fiber.Ctx) error {
 	diaryList, err := database.SelectDiaryListTop10()
 	if err != nil {
-		return postFailMethod(c)
+		log.Println(err)
+		return postFailMethod(c, "db")
 	}
 
 	result := ""
@@ -82,15 +87,18 @@ func postReadMyDiary(c *fiber.Ctx) (err error) {
 	var kakaoRequest KakaoRequest
 	err = c.BodyParser(&kakaoRequest)
 	if err != nil {
-		return postFailMethod(c)
+		log.Println(err)
+		return postFailMethod(c, "body")
 	}
-	userId, err := database.SelectUserIdByKakaoId(kakaoRequest.User.Id)
+	userId, err := database.SelectUserIdByKakaoId(kakaoRequest.UserRequest.User.Id)
 	if err != nil {
-		return postFailMethod(c)
+		log.Println(err)
+		return postFailMethod(c, "login")
 	}
 	diaryList, err := database.SelectDiaryListTop10ByUserId(userId)
 	if err != nil {
-		return postFailMethod(c)
+		log.Println(err)
+		return postFailMethod(c, "db")
 	}
 
 	result := ""
@@ -101,48 +109,98 @@ func postReadMyDiary(c *fiber.Ctx) (err error) {
 	return c.Type("application/json").JSON(makeSimpleText(result))
 }
 func postWriteDiary(c *fiber.Ctx) (err error) {
+	var kakaoRequest KakaoRequest
+	err = c.BodyParser(&kakaoRequest)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "body")
+	}
+	userId, err := database.SelectUserIdByKakaoId(kakaoRequest.UserRequest.User.Id)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "로그인이 필요합니다")
+	}
+	text, ok := kakaoRequest.Action.Params["text"].(string)
+	if !ok {
+		return postFailMethod(c, "text param")
+	}
+	err = database.InsertDiary(userId, text)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "db insert")
+	}
 	return c.Type("application/json").JSON(makeSimpleText("write"))
 }
 func postLogin(c *fiber.Ctx) (err error) {
+	var kakaoRequest KakaoRequest
+	err = c.BodyParser(&kakaoRequest)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "body")
+	}
+
+	email, ok := kakaoRequest.Action.Params["email"].(string)
+	if !ok {
+		return postFailMethod(c, "param email")
+	}
+	token, ok := kakaoRequest.Action.Params["auth_token"].(string)
+	if !ok {
+		return postFailMethod(c, "param token")
+	}
+	userId, err := database.SelectLoginToken(email, token)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "login token")
+	}
+	err = database.InsertKakaoAuth(kakaoRequest.UserRequest.User.Id, userId)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "insert kakao token")
+	}
 	return c.Type("application/json").JSON(makeSimpleText("login"))
 }
 func postLogout(c *fiber.Ctx) (err error) {
+	var kakaoRequest KakaoRequest
+	err = c.BodyParser(&kakaoRequest)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "body")
+	}
+	err = database.DeleteKakaoAuth(kakaoRequest.UserRequest.User.Id)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "delete")
+	}
 	return c.Type("application/json").JSON(makeSimpleText("logout"))
 }
 func postRequestToken(c *fiber.Ctx) (err error) {
 	var kakaoRequest KakaoRequest
 	err = c.BodyParser(&kakaoRequest)
 	if err != nil {
-		return postFailMethod(c)
+		log.Println(err)
+		return postFailMethod(c, "body")
 	}
 	email, ok := kakaoRequest.Action.Params["email"].(string)
 	if !ok {
-		return postFailMethod(c)
+		return postFailMethod(c, "param email")
 	}
 	err = database.InsertUser(email)
 	if err != nil {
-		return postFailMethod(c)
+		log.Println(err)
+		return postFailMethod(c, "db insert")
 	}
-	createdToken := randSeq(10)
+	createdToken := random.RandSeq(10)
 	err = database.UpdateToken(email, createdToken)
 	if err != nil {
-		return postFailMethod(c)
+		log.Println(err)
+		return postFailMethod(c, "db update")
 	}
-	// TODO: Email 보내기
+
+	smtp.SendMail(email, createdToken)
 	return c.Type("application/json").JSON(makeSimpleText("이메일 요청이 완료됐습니다"))
 }
-func postFailMethod(c *fiber.Ctx) (err error) {
+func postFailMethod(c *fiber.Ctx, message string) (err error) {
 	str := string(c.Body())
 	fmt.Println(str)
-	return c.Type("application/json").JSON(makeSimpleText("fail"))
-}
-
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-func randSeq(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
+	return c.Type("application/json").JSON(makeSimpleText("fail: " + message))
 }

@@ -1,4 +1,4 @@
-module golang-5252
+module modoo-diary-api
 
 go 1.18
 

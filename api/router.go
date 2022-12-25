@@ -1,7 +1,7 @@
 package api
 
 import (
-	"golang-5252/api/kakao"
+	"modoo-diary-api/api/kakao"
 
 	"github.com/gofiber/fiber/v2"
 )

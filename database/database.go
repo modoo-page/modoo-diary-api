@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 var (
@@ -20,6 +21,7 @@ func SetupDatabase() {
 
 	var err error
 	var config gorm.Config
+	config.NamingStrategy = schema.NamingStrategy{SingularTable: true}
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/modoo_diary?charset=utf8mb4&parseTime=True&loc=Local", username, password, dbHost)
 
 	DB, err = gorm.Open(mysql.Open(dsn), &config)

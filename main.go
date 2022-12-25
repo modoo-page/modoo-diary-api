@@ -1,11 +1,11 @@
 package main
 
 import (
-	"golang-5252/api"
-	"golang-5252/database"
-	"golang-5252/server"
 	"log"
 	"math/rand"
+	"modoo-diary-api/api"
+	"modoo-diary-api/database"
+	"modoo-diary-api/server"
 	"time"
 
 	"github.com/joho/godotenv"
