@@ -1,6 +1,10 @@
 package database
 
-import "time"
+import (
+	"time"
+
+	"gopkg.in/guregu/null.v4"
+)
 
 type KakaoAuth struct {
 	KakaoAuthId int    `json:"kakao_auth_id"`
@@ -26,10 +30,10 @@ type HashtagItem struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 type User struct {
-	UserId        int       `json:"user_id"`
-	Email         string    `json:"email"`
-	CreatedAt     time.Time `json:"created_at"`
-	IsDeleted     int       `json:"is_deleted"`
-	AuthToken     string    `json:"auth_token"`
-	AuthExpiredAt time.Time `json:"auth_expired_at"`
+	UserId        int         `json:"user_id"`
+	Email         string      `json:"email"`
+	CreatedAt     time.Time   `json:"created_at"`
+	IsDeleted     int         `json:"is_deleted"`
+	AuthToken     null.String `json:"auth_token"`
+	AuthExpiredAt null.Time   `json:"auth_expired_at"`
 }
