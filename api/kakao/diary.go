@@ -132,6 +132,10 @@ func postWriteDiary(c *fiber.Ctx) (err error) {
 	if !ok {
 		return postFailMethod(c, "text param")
 	}
+	if text == "취소" {
+		return c.Type("application/json").JSON(makeSimpleText("취소 됐습니다"))
+
+	}
 	err = database.InsertDiary(userId, text)
 	if err != nil {
 		log.Println(err)
