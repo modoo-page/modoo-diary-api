@@ -5,8 +5,14 @@ func SelectUserByEmail(email string) (user User, err error) {
 	err = tx.Error
 	return
 }
-func SelectDiaryListTop10() (diaryList []Diary, err error) {
-	tx := DB.Table("diary").Order("diary_id DESC").Limit(10).Scan(&diaryList)
+
+type DiaryResponse struct {
+	Diary
+	User
+}
+
+func SelectDiaryListTop10() (diaryList []DiaryResponse, err error) {
+	tx := DB.Table("diary").Joins("JOIN user ON user.user_id = diary.user_id").Order("diary_id DESC").Limit(10).Scan(&diaryList)
 	err = tx.Error
 	return
 }

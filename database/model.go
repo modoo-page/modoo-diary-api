@@ -32,8 +32,9 @@ type HashtagItem struct {
 type User struct {
 	UserId        int         `json:"user_id"`
 	Email         string      `json:"email"`
-	CreatedAt     time.Time   `json:"created_at"`
-	IsDeleted     int         `json:"is_deleted"`
+	Nickname      string      `json:"nickname"`
 	AuthToken     null.String `json:"auth_token"`
 	AuthExpiredAt null.Time   `json:"auth_expired_at"`
+	IsDeleted     int         `json:"is_deleted"`
+	CreatedAt     time.Time   `json:"created_at"`
 }

@@ -81,8 +81,8 @@ func postReadDiary(c *fiber.Ctx) error {
 	}
 
 	result := ""
-	for idx, diary := range diaryList {
-		result += fmt.Sprintf("%d: ", idx+1)
+	for _, diary := range diaryList {
+		result += fmt.Sprintf("%s  %s\n", diary.Nickname, diary.Diary.CreatedAt.Format("2006-01-02 15:04"))
 		result += diary.DiaryContent + "\n"
 		result += "==========\n"
 	}
@@ -108,8 +108,8 @@ func postReadMyDiary(c *fiber.Ctx) (err error) {
 	}
 
 	result := ""
-	for idx, diary := range diaryList {
-		result += fmt.Sprintf("%d: ", idx+1)
+	for _, diary := range diaryList {
+		result += fmt.Sprintf("%s\n", diary.CreatedAt.Format("2006-01-02 15:04"))
 		result += diary.DiaryContent + "\n"
 		result += "==========\n"
 	}
