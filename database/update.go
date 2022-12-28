@@ -7,3 +7,9 @@ func UpdateToken(email string, token null.String, time null.Time) (err error) {
 	err = tx.Error
 	return
 }
+
+func UpdateNickname(userId int, nickname string) (err error) {
+	tx := DB.Model(User{}).Where("user_id = ?", userId).Update("nickname", nickname)
+	err = tx.Error
+	return
+}

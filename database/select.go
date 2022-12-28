@@ -23,8 +23,8 @@ func SelectDiaryListTop10ByUserId(userId int) (diaryList []Diary, err error) {
 	return
 }
 
-func SelectUserIdByKakaoId(kakaoId string) (userId int, err error) {
-	tx := DB.Select("user_id").Table("kakao_auth").Where("kakao_id", kakaoId).Take(&userId)
+func SelectUserByKakaoId(kakaoId string) (user User, err error) {
+	tx := DB.Select("user_id").Table("kakao_auth").Where("kakao_id", kakaoId).Take(&user)
 	err = tx.Error
 	return
 }

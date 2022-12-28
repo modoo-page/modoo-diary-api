@@ -69,6 +69,8 @@ func PostKakaoHandler(c *fiber.Ctx) error {
 		return postLogin(c)
 	case "logout":
 		return postLogout(c)
+	case "changeNickname":
+		return postChangeNickname(c)
 	default:
 		return postFailMethod(c, "method")
 	}
@@ -96,12 +98,12 @@ func postReadMyDiary(c *fiber.Ctx) (err error) {
 		log.Println(err)
 		return postFailMethod(c, "body")
 	}
-	userId, err := database.SelectUserIdByKakaoId(kakaoRequest.UserRequest.User.Id)
+	user, err := database.SelectUserByKakaoId(kakaoRequest.UserRequest.User.Id)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "login")
 	}
-	diaryList, err := database.SelectDiaryListTop10ByUserId(userId)
+	diaryList, err := database.SelectDiaryListTop10ByUserId(user.UserId)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "db")
@@ -123,7 +125,7 @@ func postWriteDiary(c *fiber.Ctx) (err error) {
 		log.Println(err)
 		return postFailMethod(c, "body")
 	}
-	userId, err := database.SelectUserIdByKakaoId(kakaoRequest.UserRequest.User.Id)
+	user, err := database.SelectUserByKakaoId(kakaoRequest.UserRequest.User.Id)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "로그인이 필요합니다")
@@ -136,7 +138,7 @@ func postWriteDiary(c *fiber.Ctx) (err error) {
 		return c.Type("application/json").JSON(makeSimpleText("취소 됐습니다"))
 
 	}
-	err = database.InsertDiary(userId, text)
+	err = database.InsertDiary(user.UserId, text)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "db insert")
@@ -151,7 +153,7 @@ func postLogin(c *fiber.Ctx) (err error) {
 		return postFailMethod(c, "body")
 	}
 
-	_, err = database.SelectUserIdByKakaoId(kakaoRequest.UserRequest.User.Id)
+	_, err = database.SelectUserByKakaoId(kakaoRequest.UserRequest.User.Id)
 	if err != gorm.ErrRecordNotFound {
 		return postFailMethod(c, "이미 로그인 돼 있습니다")
 	}
@@ -223,6 +225,29 @@ func postRequestToken(c *fiber.Ctx) (err error) {
 
 	smtp.SendMail(email, createdToken)
 	return c.Type("application/json").JSON(makeSimpleText("이메일로 토큰 정보를 보내드렸습니다.\n확인 후 입력해주세요."))
+}
+func postChangeNickname(c *fiber.Ctx) (err error) {
+	var kakaoRequest KakaoRequest
+	err = c.BodyParser(&kakaoRequest)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "body")
+	}
+	nickname, ok := kakaoRequest.Action.Params["nickname"].(string)
+	if !ok {
+		return postFailMethod(c, "param nickname")
+	}
+	user, err := database.SelectUserByKakaoId(kakaoRequest.UserRequest.User.Id)
+	if err != nil {
+		return postFailMethod(c, "로그인이 필요합니다")
+	}
+	err = database.UpdateNickname(user.UserId, nickname)
+	if err != nil {
+		log.Println(err)
+		return postFailMethod(c, "db update")
+	}
+
+	return c.Type("application/json").JSON(makeSimpleText("nickname이 변경됐습니다"))
 }
 func postFailMethod(c *fiber.Ctx, message string) (err error) {
 	str := string(c.Body())
