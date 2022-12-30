@@ -8,6 +8,7 @@ import (
 	"modoo-diary-api/server"
 	"time"
 
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -19,6 +20,7 @@ func main() {
 	}
 	database.SetupDatabase()
 	app := server.Create()
+	app.Use(cors.New())
 	api.Route(app)
 	app.Listen(":5252")
 }
