@@ -10,6 +10,7 @@ import (
 func GetDiaryList(c *fiber.Ctx) error {
 	type ResponseBody struct {
 		DiaryId   int       `json:"diaryId"`
+		Author    string    `json:"author"`
 		Contents  string    `json:"contents"`
 		CreatedAt time.Time `json:"createdAt"`
 	}
@@ -21,6 +22,7 @@ func GetDiaryList(c *fiber.Ctx) error {
 	for _, diary := range diaryList {
 		var temp ResponseBody
 		temp.DiaryId = diary.DiaryId
+		temp.Author = diary.Nickname
 		temp.Contents = diary.DiaryContent
 		temp.CreatedAt = diary.Diary.CreatedAt
 		responseBody = append(responseBody, temp)
