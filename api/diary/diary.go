@@ -9,9 +9,9 @@ import (
 
 func GetDiaryList(c *fiber.Ctx) error {
 	type ResponseBody struct {
-		DiaryId   int
-		Contents  string
-		CreatedAt time.Time
+		DiaryId   int       `json:"diaryId"`
+		Contents  string    `json:"contents"`
+		CreatedAt time.Time `json:"createdAt"`
 	}
 	var responseBody []ResponseBody
 	diaryList, err := database.SelectDiaryListTop10()
