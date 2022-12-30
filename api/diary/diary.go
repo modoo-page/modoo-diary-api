@@ -7,7 +7,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetDiaryList(c *fiber.Ctx) error {
+func GetDiaryList(c *fiber.Ctx) (err error) {
+	type RequestQuery struct {
+		Page int `query:"page"`
+	}
 	type ResponseBody struct {
 		DiaryId   int       `json:"diaryId"`
 		Author    string    `json:"author"`
@@ -15,7 +18,14 @@ func GetDiaryList(c *fiber.Ctx) error {
 		CreatedAt time.Time `json:"createdAt"`
 	}
 	var responseBody []ResponseBody
-	diaryList, err := database.SelectDiaryListTop10()
+
+	var requestQuery RequestQuery
+	c.QueryParser(&requestQuery)
+	if requestQuery.Page == 0 {
+		requestQuery.Page = 1
+	}
+
+	diaryList, err := database.SelectDiaryListByPaging(requestQuery.Page, 10)
 	if err != nil {
 		return c.SendStatus(500)
 	}
