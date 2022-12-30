@@ -17,7 +17,7 @@ func SelectDiaryListTop10() (diaryList []DiaryResponse, err error) {
 	return
 }
 func SelectDiaryListByPaging(page int, length int) (diaryList []DiaryResponse, err error) {
-	tx := DB.Table("diary").Joins("JOIN user ON user.user_id = diary.user_id").Order("diary_id DESC").Offset(page * length).Limit(length).Scan(&diaryList)
+	tx := DB.Table("diary").Joins("JOIN user ON user.user_id = diary.user_id").Order("diary_id DESC").Offset((page - 1) * length).Limit(length).Scan(&diaryList)
 	err = tx.Error
 	return
 }
