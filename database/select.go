@@ -33,8 +33,14 @@ func SelectUserByKakaoId(kakaoId string) (user User, err error) {
 	return
 }
 
-func SelectLoginToken(email string, token string) (userId int, err error) {
-	tx := DB.Select("user_id").Table("user").Where("email = ?", email).Where("auth_token = ?", token).Scan(&userId)
+func SelectLoginToken(email string, token string) (user User, err error) {
+	tx := DB.Select("user_id").Table("user").Where("email = ?", email).Where("auth_token = ?", token).Take(&user)
+	err = tx.Error
+	return
+}
+
+func SelectUserToken(userToken string) (user User, err error) {
+	tx := DB.Select("user_id").Table("user").Where("user_token = ?", userToken).Take(&user)
 	err = tx.Error
 	return
 }

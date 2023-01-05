@@ -1,10 +1,16 @@
 package database
 
-import "gorm.io/gorm/clause"
+import (
+	"modoo-diary-api/pkg/random"
+
+	"gorm.io/gorm/clause"
+)
 
 func InsertUser(email string) (err error) {
 	var user User
 	user.Email = email
+	user.Nickname = email
+	user.UserToken = random.RandSeq(50)
 	tx := DB.Clauses(clause.OnConflict{DoNothing: true}).Create(&user) // IF NOT EXIST
 	err = tx.Error
 	return

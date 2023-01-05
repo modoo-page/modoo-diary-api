@@ -169,12 +169,12 @@ func postLogin(c *fiber.Ctx) (err error) {
 	if !ok {
 		return postFailMethod(c, "param token")
 	}
-	userId, err := database.SelectLoginToken(email, token)
+	user, err := database.SelectLoginToken(email, token)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "login token")
 	}
-	err = database.InsertKakaoAuth(kakaoRequest.UserRequest.User.Id, userId)
+	err = database.InsertKakaoAuth(kakaoRequest.UserRequest.User.Id, user.UserId)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "insert kakao token")

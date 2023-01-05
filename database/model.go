@@ -34,6 +34,7 @@ type User struct {
 	Email         string      `json:"email"`
 	Nickname      string      `json:"nickname"`
 	AuthToken     null.String `json:"auth_token"`
+	UserToken     string      `json:"user_token"`
 	AuthExpiredAt null.Time   `json:"auth_expired_at"`
 	IsDeleted     int         `json:"is_deleted"`
 	CreatedAt     time.Time   `json:"created_at"`
