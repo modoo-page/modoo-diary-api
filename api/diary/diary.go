@@ -39,3 +39,25 @@ func GetDiaryList(c *fiber.Ctx) (err error) {
 	}
 	return c.JSON(responseBody)
 }
+
+func PostDiary(c *fiber.Ctx) (err error) {
+	type RequestBody struct {
+		Diary string `json:"diary"`
+	}
+	var requestBody RequestBody
+	err = c.BodyParser(&requestBody)
+	if err != nil {
+		return c.SendStatus(400)
+	}
+
+	token := c.GetReqHeaders()["Authorization"][5:]
+	user, err := database.SelectUserToken(token)
+	if err != nil {
+		return c.SendStatus(500)
+	}
+	err = database.InsertDiary(user.UserId, requestBody.Diary)
+	if err != nil {
+		return c.SendStatus(500)
+	}
+	return c.SendStatus(200)
+}
