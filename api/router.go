@@ -12,4 +12,5 @@ func Route(app *fiber.App) {
 	app.Post("/api/kakao", kakao.PostKakaoHandler)
 	app.Get("/api/diaries", diary.GetDiaryList)
 	app.Post("/api/login/token", login.PostRequestToken)
+	app.Post("/api/login", login.PostLogin)
 }
