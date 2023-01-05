@@ -50,7 +50,7 @@ func PostDiary(c *fiber.Ctx) (err error) {
 		return c.SendStatus(400)
 	}
 
-	token := c.GetReqHeaders()["Authorization"][5:]
+	token := c.GetReqHeaders()["Authorization"][6:]
 	user, err := database.SelectUserToken(token)
 	if err != nil {
 		return c.SendStatus(500)
