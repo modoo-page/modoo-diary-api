@@ -36,7 +36,9 @@ func PostRequestToken(c *fiber.Ctx) (err error) {
 		log.Println(err)
 		return c.SendStatus(500)
 	}
-	smtp.SendMail(requestBody.Email, createdToken)
+	go func(email string, token string) {
+		smtp.SendMail(email, token)
+	}(requestBody.Email, createdToken)
 	return c.SendStatus(200)
 }
 
