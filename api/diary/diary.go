@@ -2,6 +2,7 @@ package diary
 
 import (
 	"modoo-diary-api/database"
+	"modoo-diary-api/pkg/discord"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -59,5 +60,6 @@ func PostDiary(c *fiber.Ctx) (err error) {
 	if err != nil {
 		return c.SendStatus(500)
 	}
+	discord.SendWebHook(requestBody.Diary)
 	return c.SendStatus(200)
 }
