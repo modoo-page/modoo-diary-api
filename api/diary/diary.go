@@ -60,6 +60,6 @@ func PostDiary(c *fiber.Ctx) (err error) {
 	if err != nil {
 		return c.SendStatus(500)
 	}
-	discord.SendWebHook(requestBody.Diary)
+	discord.SendWebHook(user.Nickname + ": " + requestBody.Diary)
 	return c.SendStatus(200)
 }

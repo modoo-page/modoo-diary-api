@@ -144,7 +144,7 @@ func postWriteDiary(c *fiber.Ctx) (err error) {
 		log.Println(err)
 		return postFailMethod(c, "db insert")
 	}
-	discord.SendWebHook(text)
+	discord.SendWebHook(user.Nickname + ": " + text)
 	return c.Type("application/json").JSON(makeSimpleText("일기 작성이 완료됐습니다"))
 }
 func postLogin(c *fiber.Ctx) (err error) {
