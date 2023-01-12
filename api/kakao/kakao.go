@@ -104,7 +104,7 @@ func postReadMyDiary(c *fiber.Ctx) (err error) {
 		log.Println(err)
 		return postFailMethod(c, "login")
 	}
-	diaryList, err := database.SelectDiaryListTop10ByUserId(user.UserId)
+	diaryList, err := database.SelectDiaryListTop10ByUserId(user.User.UserId)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "db")
@@ -139,7 +139,7 @@ func postWriteDiary(c *fiber.Ctx) (err error) {
 		return c.Type("application/json").JSON(makeSimpleText("취소 됐습니다"))
 
 	}
-	err = database.InsertDiary(user.UserId, text)
+	err = database.InsertDiary(user.User.UserId, text)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "db insert")
@@ -243,7 +243,7 @@ func postChangeNickname(c *fiber.Ctx) (err error) {
 	if err != nil {
 		return postFailMethod(c, "로그인이 필요합니다")
 	}
-	err = database.UpdateNickname(user.UserId, nickname)
+	err = database.UpdateNickname(user.User.UserId, nickname)
 	if err != nil {
 		log.Println(err)
 		return postFailMethod(c, "db update")

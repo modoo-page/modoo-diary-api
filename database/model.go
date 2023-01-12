@@ -7,35 +7,36 @@ import (
 )
 
 type KakaoAuth struct {
-	KakaoAuthId int    `json:"kakao_auth_id"`
-	KakaoId     string `json:"kakao_id"`
-	UserId      int    `json:"user_id"`
+	KakaoAuthId int `gorm:"primaryKey"`
+	KakaoId     string
+	UserId      int
+	CreatedAt   time.Time
 }
 type Diary struct {
-	DiaryId      int       `json:"diary_id"`
-	UserId       int       `json:"user_id"`
-	DiaryContent string    `json:"diary_content"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	DiaryId      int `gorm:"primaryKey"`
+	UserId       int
+	DiaryContent string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 type Hashtag struct {
-	HashtagId   int       `json:"hashtag_id"`
-	HashtagName string    `json:"hashtag_name"`
-	CreatedAt   time.Time `json:"created_at"`
+	HashtagId   int `gorm:"primaryKey"`
+	HashtagName string
+	CreatedAt   time.Time
 }
 type HashtagItem struct {
-	HashtagItemId int       `json:"hashtag_item_id"`
-	DiaryId       int       `json:"diary_id"`
-	HashtagId     int       `json:"hashtag_id"`
-	CreatedAt     time.Time `json:"created_at"`
+	HashtagItemId int `gorm:"primaryKey"`
+	DiaryId       int
+	HashtagId     int
+	CreatedAt     time.Time
 }
 type User struct {
-	UserId        int         `json:"user_id"`
-	Email         string      `json:"email"`
-	Nickname      string      `json:"nickname"`
-	AuthToken     null.String `json:"auth_token"`
-	UserToken     string      `json:"user_token"`
-	AuthExpiredAt null.Time   `json:"auth_expired_at"`
-	IsDeleted     int         `json:"is_deleted"`
-	CreatedAt     time.Time   `json:"created_at"`
+	UserId        int `gorm:"primaryKey"`
+	Email         string
+	Nickname      string
+	UserToken     string
+	AuthToken     null.String
+	AuthExpiredAt null.Time
+	IsDeleted     int
+	CreatedAt     time.Time
 }

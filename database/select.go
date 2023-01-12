@@ -27,8 +27,13 @@ func SelectDiaryListTop10ByUserId(userId int) (diaryList []Diary, err error) {
 	return
 }
 
-func SelectUserByKakaoId(kakaoId string) (user User, err error) {
-	tx := DB.Select("user_id").Table("kakao_auth").Where("kakao_id", kakaoId).Take(&user)
+type KakaoUserResponse struct {
+	KakaoAuth
+	User
+}
+
+func SelectUserByKakaoId(kakaoId string) (kakaoUser KakaoUserResponse, err error) {
+	tx := DB.Table("kakao_auth").Where("kakao_id", kakaoId).Joins("JOIN user ON user.user_id = kakao_auth.user_id").Scan(&kakaoUser)
 	err = tx.Error
 	return
 }
