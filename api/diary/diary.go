@@ -3,6 +3,7 @@ package diary
 import (
 	"modoo-diary-api/database"
 	"modoo-diary-api/pkg/discord"
+	"modoo-diary-api/pkg/slack"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -61,5 +62,6 @@ func PostDiary(c *fiber.Ctx) (err error) {
 		return c.SendStatus(500)
 	}
 	discord.SendWebHook(user.Nickname + ": " + requestBody.Diary)
+	slack.SendWebHook(user.Nickname + ": " + requestBody.Diary)
 	return c.SendStatus(200)
 }

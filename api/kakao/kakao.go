@@ -6,6 +6,7 @@ import (
 	"modoo-diary-api/database"
 	"modoo-diary-api/pkg/discord"
 	"modoo-diary-api/pkg/random"
+	"modoo-diary-api/pkg/slack"
 	smtp "modoo-diary-api/pkg/smtp"
 	"regexp"
 	"time"
@@ -145,6 +146,7 @@ func postWriteDiary(c *fiber.Ctx) (err error) {
 		return postFailMethod(c, "db insert")
 	}
 	discord.SendWebHook(user.Nickname + ": " + text)
+	slack.SendWebHook(user.Nickname + ": " + text)
 	return c.Type("application/json").JSON(makeSimpleText("일기 작성이 완료됐습니다"))
 }
 func postLogin(c *fiber.Ctx) (err error) {
